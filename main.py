@@ -40,7 +40,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.timer.setInterval(10)
         self.timer.timeout.connect(self.update_plot_data)
         self.timer.start()
-        self.pen = pg.mkPen(color=(199,36,177),width= 2)
+        self.pen = pg.mkPen(color=(142, 68, 173),width= 2)
 
         self.ser_port = EEGSerialCommunication()
         self.ser_port.turn_simulator_on()
@@ -50,23 +50,23 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def initUI(self):
         self.setWindowTitle("EEG app")
-        self.setStyleSheet("background-color: black;")
+        self.setStyleSheet("background-color: rgb(30, 30, 30);")
         self.layout = QGridLayout()
 
         self.graphWidgetEEG = pg.PlotWidget()        
-        self.graphWidgetEEG.setBackground('k')
+        self.graphWidgetEEG.setBackground('#1E1E1E')
         self.graphWidgetEEG.setMaximumSize(600, 200)
         self.graphWidgetEEG.setMinimumSize(600, 200)
-        self.graphWidgetEEG.getAxis('left').setPen('b')
-        self.graphWidgetEEG.getAxis('bottom').setPen('b')
+        self.graphWidgetEEG.getAxis('left').setPen("#444444")
+        self.graphWidgetEEG.getAxis('bottom').setPen('#444444')
         
 
         self.graphWidgetMovement = pg.PlotWidget()
-        self.graphWidgetMovement.setBackground('k')
+        self.graphWidgetMovement.setBackground('#1E1E1E')
         self.graphWidgetMovement.setMaximumSize(600, 200)
         self.graphWidgetMovement.setMinimumSize(600, 200)
-        self.graphWidgetMovement.getAxis('left').setPen('b')
-        self.graphWidgetMovement.getAxis('bottom').setPen('b')
+        self.graphWidgetMovement.getAxis('left').setPen('#444444')
+        self.graphWidgetMovement.getAxis('bottom').setPen('#444444')
 
         self.button = QPushButton('Start')
         self.button.setToolTip("This is a start\stop button")
@@ -87,11 +87,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.combox = QComboBox()
         self.combox.setStyleSheet("""QComboBox QAbstractItemView {
-                                    background: rgb(77, 77, 255);
+                                    background: rgb(68, 173, 82);
                                     selection-background-color: blue;
                                     }
                                     QComboBox {
-                                    background: rgb(77, 77, 255);
+                                    background: rgb(68, 173, 82);
                                     }""")
         self.combox.setMaximumSize(100, 40)
         self.combox.setMinimumSize(100, 40)
@@ -102,13 +102,14 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
         self.length_label = QLabel("Singal display time")
-        self.length_label.setStyleSheet("color: rgb(77, 77, 255)")
+        self.length_label.setStyleSheet("color: rgb(217, 217, 217)")
         self.length_label.resize(100, 40)
         self.signal_length = QSpinBox()
         self.signal_length.resize(100, 40)
-        self.signal_length.setStyleSheet("color: rgb(77, 77, 255)")
+        self.signal_length.setStyleSheet("color: rgb(217, 217, 217)")
         self.signal_length.setValue(self.current_time)
         self.signal_length.valueChanged.connect(self.set_time_settings)
+        self.signal_length.setMinimumSize(100, 40)
 
 
         self.layout.addWidget(self.button, 0, 1)
