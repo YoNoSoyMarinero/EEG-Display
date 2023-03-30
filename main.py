@@ -11,15 +11,23 @@ from random import randint
 class MainWindow(QtWidgets.QMainWindow):
 
     def set_time_settings(self):
-        spinbox_value = self.signal_length.value() if self.signal_length.value() > 0 else 5
-        self.eeg_x = list(np.linspace(0.0, spinbox_value, num=spinbox_value*160))
-        self.eeg_y = [0 for _ in range(spinbox_value*160)]
+        spinbox_value = self.signal_length.value() if self.signal_length.value() > 0 else 1
 
-        self.movement_x = list(np.linspace(0.0, spinbox_value, num=spinbox_value*160))
-        self.movement_y = [0 for _ in range(spinbox_value*160)]
+        if spinbox_value < self.current_time:
+            self.eeg_x = self.eeg_x[160*(self.current_time - spinbox_value):]
+            self.eeg_y = self.eeg_y[160*(self.current_time - spinbox_value):]
+            self.movement_x = self.movement_x[160*(self.current_time - spinbox_value):]
+            self.movement_y = self.movement_y[160*(self.current_time - spinbox_value):]
+        else:
+            self.eeg_x =  [0 for _ in range(160*((spinbox_value - self.current_time)))] + self.eeg_x
+            self.eeg_y = [0 for _ in range(160*((spinbox_value - self.current_time)))] + self.eeg_y
+            self.movement_x = [0 for _ in range(160*((spinbox_value - self.current_time)))] + self.movement_x
+            self.movement_y = [0 for _ in range(160*((spinbox_value - self.current_time )))] + self.movement_y
 
+        self.current_time = spinbox_value
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
+        self.current_time = 5
 
         self.eeg_x = list(np.linspace(0.0, 5.0, num=800))
         self.eeg_y = [0 for _ in range(800)]
@@ -29,7 +37,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.plot = False
 
         self.timer = QtCore.QTimer()
-        self.timer.setInterval(20)
+        self.timer.setInterval(10)
         self.timer.timeout.connect(self.update_plot_data)
         self.timer.start()
         self.pen = pg.mkPen(color=(199,36,177),width= 2)
@@ -59,12 +67,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.graphWidgetMovement.setMinimumSize(600, 200)
         self.graphWidgetMovement.getAxis('left').setPen('b')
         self.graphWidgetMovement.getAxis('bottom').setPen('b')
-
-        self.set_setting_button = QPushButton("Set time")
-        self.set_setting_button.setMaximumSize(100, 40)
-        self.set_setting_button.setMinimumSize(100, 40)
-        self.set_setting_button.setStyleSheet("QPushButton {background-color : rgb(57, 255, 20)}")
-        self.set_setting_button.clicked.connect(self.set_time_settings)
 
         self.button = QPushButton('Start')
         self.button.setToolTip("This is a start\stop button")
@@ -105,6 +107,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.signal_length = QSpinBox()
         self.signal_length.resize(100, 40)
         self.signal_length.setStyleSheet("color: rgb(77, 77, 255)")
+        self.signal_length.setValue(self.current_time)
+        self.signal_length.valueChanged.connect(self.set_time_settings)
 
 
         self.layout.addWidget(self.button, 0, 1)
@@ -113,7 +117,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.layout.addWidget(self.combox, 0, 2)
         self.layout.addWidget(self.length_label, 0, 3)
         self.layout.addWidget(self.signal_length, 0, 4)
-        self.layout.addWidget(self.set_setting_button, 0, 5)
 
         widget = QWidget()
         widget.setLayout(self.layout)
@@ -139,12 +142,12 @@ class MainWindow(QtWidgets.QMainWindow):
     def update_plot_data(self):
         
         if self.plot:
-            self.set_setting_button.setDisabled(True)
             current_row = self.ser_port.read_line()
             if not current_row:
                 return
             self.eeg_x = self.eeg_x[1:]
             self.eeg_x.append(self.eeg_x[-1] + 0.00625)
+            
 
             self.movement_x = self.movement_x[1:]
             self.movement_x.append(self.movement_x[-1] + 0.00625)
@@ -159,7 +162,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self.data_line_eeg.setData(self.eeg_x, self.eeg_y)
             self.data_line_movement.setData(self.movement_x, self.movement_y)
         else:
-            self.set_setting_button.setDisabled(False)
             pass
 
 app = QtWidgets.QApplication(sys.argv)
