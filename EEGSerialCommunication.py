@@ -5,13 +5,13 @@ import time
 
 class EEGSerialCommunication:
 
-    def turn_channel(self):
+    def turn_channel(self, value):
         message_string = ">SC;xyz<"
         message = bytearray()
         message.extend(map(ord, message_string))
-        message[4] = 255
-        message[5] = 255
-        message[6] = 255
+        message[4] = value
+        message[5] = value
+        message[6] = value
         self.port.write(message)
         time.sleep(0.5)
     def turn_simulator_on(self):
@@ -80,6 +80,8 @@ class EEGSerialCommunication:
 def main():
     ser_port = EEGSerialCommunication()
     ser_port.turn_simulator_off()
+    ser_port.turn_channel(0)
+
 
 if __name__ == "__main__":
     main()

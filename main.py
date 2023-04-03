@@ -37,16 +37,19 @@ class MainWindow(QtWidgets.QMainWindow):
         self.plot = False
 
         self.timer = QtCore.QTimer()
-        self.timer.setInterval(10)
+        self.timer.setInterval(5)
         self.timer.timeout.connect(self.update_plot_data)
         self.timer.start()
         self.pen = pg.mkPen(color=(142, 68, 173),width= 2)
 
         self.ser_port = EEGSerialCommunication()
         self.ser_port.turn_simulator_on()
-        self.ser_port.turn_channel()
+        self.ser_port.turn_channel(255)
 
         self.initUI()
+
+    def __del__(self):
+        self.ser_port.turn_simulator_off()
 
     def initUI(self):
         self.setWindowTitle("EEG app")
@@ -57,6 +60,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.graphWidgetEEG.setBackground('#1E1E1E')
         self.graphWidgetEEG.setMaximumSize(600, 200)
         self.graphWidgetEEG.setMinimumSize(600, 200)
+        self.graphWidgetEEG.setYRange(-500, 500, padding=0)
         self.graphWidgetEEG.getAxis('left').setPen("#444444")
         self.graphWidgetEEG.getAxis('bottom').setPen('#444444')
         
@@ -65,6 +69,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.graphWidgetMovement.setBackground('#1E1E1E')
         self.graphWidgetMovement.setMaximumSize(600, 200)
         self.graphWidgetMovement.setMinimumSize(600, 200)
+        self.graphWidgetMovement.setYRange(0, 2, padding=0)
         self.graphWidgetMovement.getAxis('left').setPen('#444444')
         self.graphWidgetMovement.getAxis('bottom').setPen('#444444')
 
